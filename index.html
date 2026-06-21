@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#FF9B00" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<title>Woordje · Dutch A2</title>
+<style>
+  /* ============ Design tokens ============ */
+  :root{
+    --bg:#FFF8EF;
+    --surface:#FFFFFF;
+    --ink:#2B2B33;
+    --muted:#8E8E98;
+    --line:#ECECEC;
+    --orange:#FF9B00;
+    --orange-dark:#D97F00;
+    --green:#58CC02;
+    --green-dark:#46A302;
+    --red:#FF4B4B;
+    --red-dark:#D63B3B;
+    --blue:#1CB0F6;
+    --blue-dark:#1690CC;
+    --gold:#FFC800;
+    --radius:18px;
+    --safe-top:env(safe-area-inset-top, 0px);
+    --safe-bottom:env(safe-area-inset-bottom, 0px);
+    --footer-h:64px;
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN",
+                "Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-weight:700;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overscroll-behavior-y:none;
+    touch-action:manipulation;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  .app{
+    max-width:520px;margin:0 auto;min-height:100%;
+    display:flex;flex-direction:column;position:relative;
+  }
+
+  /* ============ Header ============ */
+  header.top{
+    position:sticky;top:0;z-index:20;
+    padding:calc(var(--safe-top) + 12px) 16px 12px;
+    background:var(--bg);
+    border-bottom:1px solid var(--line);
+  }
+  .stats-row{display:flex;align-items:center;gap:10px;}
+  .stat{
+    display:flex;align-items:center;gap:5px;
+    font-size:17px;line-height:1;white-space:nowrap;
+  }
+  .stat .ico{font-size:19px;}
+  .stat.streak{color:var(--orange);}
+  .stat.xp{color:var(--gold);}
+  .stat.spacer{flex:1;}
+  .progress-track{
+    margin-top:11px;height:14px;border-radius:99px;
+    background:var(--line);overflow:hidden;position:relative;
+  }
+  .progress-fill{
+    height:100%;border-radius:99px;
+    background:linear-gradient(90deg,var(--orange),#FFB740);
+    width:0%;transition:width .55s cubic-bezier(.2,.8,.2,1);
+    box-shadow:inset 0 -3px 0 rgba(0,0,0,.08);
+  }
+  .progress-label{
+    margin-top:6px;font-size:12px;color:var(--muted);font-weight:800;
+    letter-spacing:.02em;text-transform:uppercase;
+  }
+
+  /* ============ Main ============ */
+  main{
+    flex:1;padding:18px 16px;
+    padding-bottom:calc(var(--footer-h) + var(--safe-bottom) + 18px);
+  }
+  .screen{display:none;animation:slideUp .32s cubic-bezier(.2,.8,.2,1);}
+  .screen.active{display:block;}
+  @keyframes slideUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+  h1.greet{font-size:26px;margin:2px 0 2px;letter-spacing:-.01em;}
+  .sub{color:var(--muted);font-size:15px;font-weight:700;margin:0 0 18px;}
+
+  /* ===== Level cards ===== */
+  .level-card{
+    position:relative;background:var(--surface);
+    border:2px solid var(--line);border-bottom-width:5px;
+    border-radius:var(--radius);padding:16px;margin-bottom:14px;
+    display:flex;align-items:center;gap:14px;
+    transition:transform .08s ease;
+  }
+  .level-card.unlocked:active{transform:translateY(2px);border-bottom-width:3px;}
+  .level-card.locked{opacity:.62;}
+  .level-badge{
+    width:54px;height:54px;flex:0 0 auto;border-radius:16px;
+    display:grid;place-items:center;font-size:26px;color:#fff;
+    background:var(--orange);box-shadow:0 4px 0 var(--orange-dark);
+  }
+  .level-card.locked .level-badge{background:#C9C9CF;box-shadow:0 4px 0 #ADADB5;}
+  .level-card.done .level-badge{background:var(--green);box-shadow:0 4px 0 var(--green-dark);}
+  .level-meta{flex:1;min-width:0;}
+  .level-meta .name{font-size:18px;line-height:1.15;}
+  .level-meta .cat{color:var(--muted);font-size:13px;font-weight:700;margin-top:3px;}
+  .level-meta .bestbar{
+    margin-top:8px;height:8px;border-radius:99px;background:var(--line);overflow:hidden;
+  }
+  .level-meta .bestbar > i{display:block;height:100%;background:var(--green);border-radius:99px;}
+  .level-chevron{font-size:20px;color:var(--muted);}
+
+  .review-tile{
+    background:linear-gradient(135deg,#1CB0F6,#0E8FD1);
+    color:#fff;border:none;border-bottom:5px solid var(--blue-dark);
+    border-radius:var(--radius);padding:16px;margin-bottom:18px;width:100%;
+    display:flex;align-items:center;gap:14px;text-align:left;
+    transition:transform .08s ease;
+  }
+  .review-tile:active{transform:translateY(2px);border-bottom-width:3px;}
+  .review-tile .rico{font-size:30px;}
+  .review-tile .rmeta .rname{font-size:18px;}
+  .review-tile .rmeta .rsub{font-size:13px;opacity:.9;font-weight:700;margin-top:2px;}
+
+  /* ===== Game ===== */
+  .game-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .icon-btn{
+    width:48px;height:48px;flex:0 0 auto;border-radius:12px;border:2px solid var(--line);
+    background:var(--surface);display:grid;place-items:center;font-size:20px;color:var(--muted);
+  }
+  .icon-btn:active{transform:scale(.94);}
+  .qbar-track{flex:1;height:16px;border-radius:99px;background:var(--line);overflow:hidden;}
+  .qbar-fill{height:100%;border-radius:99px;background:var(--green);width:0%;
+    transition:width .35s cubic-bezier(.2,.8,.2,1);}
+
+  .prompt-label{color:var(--muted);font-size:14px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.05em;margin-bottom:14px;}
+  .word-card{
+    background:var(--surface);border:2px solid var(--line);border-radius:22px;
+    padding:34px 22px;text-align:center;margin-bottom:8px;
+    box-shadow:0 6px 0 rgba(0,0,0,.04);
+  }
+  .word-card .word{font-size:34px;line-height:1.1;letter-spacing:-.01em;}
+  .word-card .speak{margin-top:14px;display:inline-flex;align-items:center;gap:7px;
+    color:var(--blue);font-size:14px;background:none;border:none;}
+  .word-card .speak .ico{font-size:20px;}
+
+  .choices{margin-top:22px;display:flex;flex-direction:column;gap:12px;}
+  .choice{
+    width:100%;min-height:56px;border-radius:16px;background:var(--surface);
+    border:2px solid var(--line);border-bottom-width:4px;
+    color:var(--ink);font-size:18px;font-family:inherit;font-weight:800;
+    padding:14px 18px;text-align:left;transition:transform .08s,background .12s,border-color .12s;
+  }
+  .choice:active{transform:translateY(2px);border-bottom-width:2px;}
+  .choice.correct{background:#E8FAD9;border-color:var(--green);color:var(--green-dark);}
+  .choice.wrong{background:#FFE9E9;border-color:var(--red);color:var(--red-dark);}
+  .choice.dim{opacity:.5;}
+  .choice[disabled]{pointer-events:none;}
+
+  /* feedback footer */
+  .feedback{
+    position:fixed;left:0;right:0;
+    bottom:calc(var(--footer-h) + var(--safe-bottom));
+    transform:translateY(130%);transition:transform .28s cubic-bezier(.2,.8,.2,1);
+    z-index:30;padding:18px 16px calc(18px);
+  }
+  .feedback.show{transform:translateY(0);}
+  .feedback.ok{background:#E8FAD9;}
+  .feedback.no{background:#FFE9E9;}
+  .feedback .fb-inner{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px;}
+  .feedback .fb-ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+    font-size:24px;color:#fff;flex:0 0 auto;}
+  .feedback.ok .fb-ico{background:var(--green);}
+  .feedback.no .fb-ico{background:var(--red);}
+  .feedback .fb-text .t{font-size:18px;}
+  .feedback.ok .fb-text .t{color:var(--green-dark);}
+  .feedback.no .fb-text .t{color:var(--red-dark);}
+  .feedback .fb-text .s{font-size:14px;font-weight:700;color:var(--ink);opacity:.8;margin-top:1px;}
+  .fb-continue{
+    flex:0 0 auto;border:none;border-radius:13px;color:#fff;font-family:inherit;font-weight:800;
+    font-size:14px;text-transform:uppercase;letter-spacing:.03em;padding:12px 16px;
+  }
+  .feedback.ok .fb-continue{background:var(--green);box-shadow:0 4px 0 var(--green-dark);}
+  .feedback.no .fb-continue{background:var(--red);box-shadow:0 4px 0 var(--red-dark);}
+  .fb-continue:active{transform:translateY(3px);box-shadow:none;}
+
+  /* big action button */
+  .btn-primary{
+    width:100%;border:none;border-radius:16px;color:#fff;font-family:inherit;
+    font-size:18px;font-weight:800;letter-spacing:.02em;padding:16px;
+    background:var(--green);box-shadow:0 5px 0 var(--green-dark);
+    transition:transform .07s,box-shadow .07s;text-transform:uppercase;
+  }
+  .btn-primary:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-dark);}
+  .btn-primary.orange{background:var(--orange);box-shadow:0 5px 0 var(--orange-dark);}
+  .btn-primary.orange:active{box-shadow:0 1px 0 var(--orange-dark);}
+  .btn-ghost{
+    width:100%;border:2px solid var(--line);border-bottom-width:4px;border-radius:16px;
+    background:var(--surface);color:var(--muted);font-family:inherit;font-size:16px;
+    font-weight:800;padding:14px;margin-top:12px;text-transform:uppercase;letter-spacing:.02em;
+  }
+  .btn-ghost:active{transform:translateY(2px);border-bottom-width:2px;}
+
+  /* ===== Results ===== */
+  .results-wrap{text-align:center;padding-top:12px;}
+  .trophy{font-size:74px;margin:8px 0 4px;animation:pop .5s cubic-bezier(.2,1.4,.4,1);}
+  @keyframes pop{0%{transform:scale(0);}70%{transform:scale(1.15);}100%{transform:scale(1);}}
+  .results-title{font-size:28px;margin:2px 0;}
+  .results-sub{color:var(--muted);font-size:15px;margin-bottom:22px;}
+  .result-stats{display:flex;gap:12px;margin-bottom:22px;}
+  .rstat{flex:1;background:var(--surface);border:2px solid var(--line);border-bottom-width:4px;
+    border-radius:16px;padding:14px 8px;}
+  .rstat .big{font-size:26px;}
+  .rstat .lab{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;margin-top:3px;}
+  .rstat.acc .big{color:var(--green);}
+  .rstat.xp .big{color:var(--gold);}
+  .rstat.streak .big{color:var(--orange);}
+
+  /* ===== Progress screen ===== */
+  .panel{background:var(--surface);border:2px solid var(--line);border-bottom-width:4px;
+    border-radius:var(--radius);padding:16px;margin-bottom:14px;}
+  .panel h3{margin:0 0 4px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+  .big-grid{display:flex;gap:12px;margin-bottom:14px;}
+  .big-grid .cell{flex:1;background:var(--surface);border:2px solid var(--line);border-bottom-width:4px;
+    border-radius:16px;padding:16px 10px;text-align:center;}
+  .big-grid .cell .n{font-size:30px;}
+  .big-grid .cell .l{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;margin-top:4px;}
+  .lvl-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);}
+  .lvl-row:last-child{border-bottom:none;}
+  .lvl-row .dot{width:11px;height:11px;border-radius:50%;background:var(--line);flex:0 0 auto;}
+  .lvl-row .dot.done{background:var(--green);}
+  .lvl-row .nm{flex:1;font-size:15px;}
+  .lvl-row .sc{font-size:14px;color:var(--muted);}
+  .lvl-row .sc.good{color:var(--green);}
+  .danger{color:var(--red);background:none;border:none;font-family:inherit;font-weight:800;
+    font-size:14px;padding:8px 0;width:100%;text-align:center;text-transform:uppercase;letter-spacing:.03em;}
+
+  /* ===== Footer nav ===== */
+  nav.bottom{
+    position:fixed;left:0;right:0;bottom:0;z-index:25;
+    height:calc(var(--footer-h) + var(--safe-bottom));
+    padding-bottom:var(--safe-bottom);
+    background:var(--surface);border-top:1px solid var(--line);
+    display:flex;
+  }
+  nav.bottom .nav-inner{max-width:520px;margin:0 auto;width:100%;display:flex;}
+  .nav-btn{flex:1;border:none;background:none;font-family:inherit;color:var(--muted);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;}
+  .nav-btn .ico{font-size:23px;line-height:1;}
+  .nav-btn.active{color:var(--orange);}
+  .nav-btn:active{transform:scale(.93);}
+
+  .shake{animation:shake .4s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-7px);}
+    40%{transform:translateX(7px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
+
+  .empty{text-align:center;color:var(--muted);font-size:15px;padding:40px 10px;font-weight:700;}
+  .empty .e-ico{font-size:48px;display:block;margin-bottom:10px;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+  }
+</style>
+</head>
+<body>
+<noscript>
+  <div style="padding:24px;font-family:system-ui,sans-serif;line-height:1.5">
+    <h2 style="color:#FF9B00">JavaScript is off</h2>
+    <p>This app builds its screens with JavaScript. You're likely viewing it in a
+    file <b>preview</b> (e.g. the iOS Files Quick Look), which doesn't run scripts.
+    Open it in a real browser via an <b>https://</b> link (host it on GitHub Pages,
+    Netlify Drop, or Cloudflare Pages) and it will work.</p>
+  </div>
+</noscript>
+<div class="app">
+  <!-- ============ HEADER ============ -->
+  <header class="top">
+    <div class="stats-row">
+      <span class="stat streak"><span class="ico">🔥</span><span id="hdrStreak">0</span></span>
+      <span class="stat xp"><span class="ico">⭐</span><span id="hdrXp">0</span></span>
+      <span class="stat spacer"></span>
+      <span class="stat" style="color:var(--green)"><span class="ico">🏅</span><span id="hdrLevels">0/5</span></span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="hdrProgress"></div></div>
+    <div class="progress-label" id="hdrProgressLabel">Course progress</div>
+  </header>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+    <!-- ===== MENU ===== -->
+    <section class="screen active" id="screen-menu">
+      <h1 class="greet" id="greetLine">Goedendag! 👋</h1>
+      <p class="sub">Pick a unit and learn 10 words at a time.</p>
+      <button class="review-tile" id="reviewTile" style="display:none" onclick="startReview()">
+        <span class="rico">🃏</span>
+        <span class="rmeta">
+          <span class="rname">Review Deck</span>
+          <span class="rsub"><span id="reviewCount">0</span> words to practise</span>
+        </span>
+      </button>
+      <div id="levelList"></div>
+    </section>
+
+    <!-- ===== GAME ===== -->
+    <section class="screen" id="screen-game">
+      <div class="game-head">
+        <button class="icon-btn" onclick="confirmQuit()" aria-label="Quit">✕</button>
+        <div class="qbar-track"><div class="qbar-fill" id="qbarFill"></div></div>
+      </div>
+      <div class="prompt-label" id="promptLabel">Translate to English</div>
+      <div class="word-card">
+        <div class="word" id="wordText">—</div>
+        <button class="speak" onclick="speakWord()"><span class="ico">🔊</span>Listen</button>
+      </div>
+      <div class="choices" id="choices"></div>
+    </section>
+
+    <!-- ===== RESULTS ===== -->
+    <section class="screen" id="screen-results">
+      <div class="results-wrap">
+        <div class="trophy" id="resultTrophy">🏆</div>
+        <h2 class="results-title" id="resultTitle">Round complete!</h2>
+        <p class="results-sub" id="resultSub"></p>
+        <div class="result-stats">
+          <div class="rstat acc"><div class="big" id="resAcc">0%</div><div class="lab">Accuracy</div></div>
+          <div class="rstat xp"><div class="big" id="resXp">+0</div><div class="lab">XP</div></div>
+          <div class="rstat streak"><div class="big" id="resStreak">0</div><div class="lab">Streak</div></div>
+        </div>
+        <button class="btn-primary" id="resPrimary" onclick="resultPrimary()">Continue</button>
+        <button class="btn-ghost" onclick="goMenu()">Back to units</button>
+      </div>
+    </section>
+
+    <!-- ===== PROGRESS ===== -->
+    <section class="screen" id="screen-progress">
+      <h1 class="greet">Your progress</h1>
+      <p class="sub">Every round keeps the streak alive.</p>
+      <div class="big-grid">
+        <div class="cell"><div class="n" style="color:var(--orange)" id="pStreak">0</div><div class="l">🔥 Day streak</div></div>
+        <div class="cell"><div class="n" style="color:var(--gold)" id="pXp">0</div><div class="l">⭐ Total XP</div></div>
+      </div>
+      <div class="panel">
+        <h3>Units mastered</h3>
+        <div id="pLevels"></div>
+      </div>
+      <div class="panel">
+        <h3>Review deck</h3>
+        <div id="pReview" class="lvl-row" style="border:none;padding:6px 0;">
+          <span class="nm">Words to revisit</span>
+          <span class="sc" id="pReviewCount">0</span>
+        </div>
+        <button class="btn-primary orange" id="pReviewBtn" style="margin-top:8px" onclick="startReview()">Practise review deck</button>
+      </div>
+      <div class="panel">
+        <button class="danger" onclick="resetAll()">Reset all progress</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- feedback slide-up -->
+  <div class="feedback" id="feedback">
+    <div class="fb-inner">
+      <div class="fb-ico" id="fbIco">✓</div>
+      <div class="fb-text" style="flex:1;"><div class="t" id="fbTitle">Nice!</div><div class="s" id="fbSub"></div></div>
+      <button class="fb-continue" id="fbContinue" onclick="next()">Continue</button>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <nav class="bottom">
+    <div class="nav-inner">
+      <button class="nav-btn active" id="nav-learn" onclick="goMenu()">
+        <span class="ico">🏠</span>Learn
+      </button>
+      <button class="nav-btn" id="nav-progress" onclick="goProgress()">
+        <span class="ico">📊</span>Progress
+      </button>
+    </div>
+  </nav>
+</div>
+
+<script>
+/* =========================================================
+   DATA — Dutch A2 vocabulary (60 words across 5 units)
+   ========================================================= */
+const VOCAB = [
+  // Level 1 — Basics
+  {id:1,  dutch:"Hallo",         english:"Hello",                  category:"Basics", level:1},
+  {id:2,  dutch:"Bedankt",       english:"Thank you",              category:"Basics", level:1},
+  {id:3,  dutch:"Alstublieft",   english:"Please / here you go",   category:"Basics", level:1},
+  {id:4,  dutch:"Goedemorgen",   english:"Good morning",           category:"Basics", level:1},
+  {id:5,  dutch:"Vandaag",       english:"Today",                  category:"Basics", level:1},
+  {id:6,  dutch:"Morgen",        english:"Tomorrow",               category:"Basics", level:1},
+  {id:7,  dutch:"Gisteren",      english:"Yesterday",              category:"Basics", level:1},
+  {id:8,  dutch:"Misschien",     english:"Maybe",                  category:"Basics", level:1},
+  {id:9,  dutch:"Altijd",        english:"Always",                 category:"Basics", level:1},
+  {id:10, dutch:"De week",       english:"The week",               category:"Basics", level:1},
+  {id:11, dutch:"Het jaar",      english:"The year",               category:"Basics", level:1},
+  {id:12, dutch:"De dag",        english:"The day",                category:"Basics", level:1},
+
+  // Level 2 — Family & Housing
+  {id:13, dutch:"De moeder",     english:"The mother",             category:"Family & Housing", level:2},
+  {id:14, dutch:"De vader",      english:"The father",             category:"Family & Housing", level:2},
+  {id:15, dutch:"Het kind",      english:"The child",              category:"Family & Housing", level:2},
+  {id:16, dutch:"Het gezin",     english:"The family (household)", category:"Family & Housing", level:2},
+  {id:17, dutch:"De buurman",    english:"The neighbour",          category:"Family & Housing", level:2},
+  {id:18, dutch:"Het huis",      english:"The house",              category:"Family & Housing", level:2},
+  {id:19, dutch:"De woning",     english:"The dwelling",           category:"Family & Housing", level:2},
+  {id:20, dutch:"De keuken",     english:"The kitchen",            category:"Family & Housing", level:2},
+  {id:21, dutch:"De slaapkamer", english:"The bedroom",            category:"Family & Housing
